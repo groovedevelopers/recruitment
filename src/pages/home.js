@@ -87,24 +87,25 @@ const Home = () => {
     };
   }, []);
 
-  const showNext = ({ item }) => {
-    if (products.length === 0) {
-      //use this to show hide buttons if there is no records
-    } else {
-      const fetchNextData = async () => {
-        firstValueFrom(getProductFromFirebase())
-          .then((item) => {
-            // console.log(item);
-            products$.current.next(item)
-          
-            setPage(page + 1);
-          })
-          .catch((error) => {
-            console.log(error);
-          });
-      };
-      fetchNextData();
+  const showNext = () => {
+
+    if(pageRef.current === 5){
+      return;
+
     }
+    pageRef.current = pageRef.current + 1
+    setPage(pageRef.current )
+
+    firstValueFrom(getProductFromFirebase(pageRef.current))
+    .then((item) => {
+      // console.log(item);
+      products$.current.next(item)
+    
+      setPage(page + 1);
+    })
+    .catch((error) => {
+      console.log(error);
+    });
   };
 
   //previous button function
@@ -117,18 +118,17 @@ const Home = () => {
     pageRef.current = pageRef.current -1
     setPage(pageRef.current )
 
-    const fetchPreviousData = async () => {
-      firstValueFrom(getProductFromFirebase( pageRef.current ))
-        .then((item) => {
-          // console.log(item);
-          products$.current.next(item)
-          setPage(page - 1);
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    };
-    fetchPreviousData();
+    firstValueFrom(getProductFromFirebase( pageRef.current ))
+    .then((item) => {
+      // console.log(item);
+      products$.current.next(item)
+   
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+
+    
   };
 
   const cart = async (item) => {
