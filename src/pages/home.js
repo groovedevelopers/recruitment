@@ -21,7 +21,6 @@ import {
   getFeaturedProductFromFirebase,
 } from "../server/firebase.config";
 import { useLocation } from "react-router-dom";
-import { firestoreFacade } from "../server/firestore.facades";
 import { GiCampfire } from "react-icons/gi";
 import { GrFormPrevious, GrFormNext } from "react-icons/gr";
 import { firstValueFrom } from "rxjs";
@@ -51,7 +50,7 @@ const Home = () => {
     const featuredSubs = getFeaturedProductFromFirebase("products").subscribe(
       (item) => {
         setFeatured(item);
-        console.log(item);
+        // console.log(item);
       }
     );
 
@@ -108,15 +107,17 @@ const showPrevious = ({item}) => {
     fetchPreviousData();
 };
 
-  const cart = async () => {
-    const name = currentProduct?.name;
-    const price = currentProduct?.price;
-    const productId = currentProduct?.id;
-    const cartImage = currentProduct?.image?.src;
+  const cart = async (item) => {
+    const name = item?.name;
+    const price = item?.price;
+    const productId = item?.id;
+    const cartImage = item?.image?.src;
     const products = { name, price, productId, cartImage };
-    // console.log(products)
+    console.log(products)
 
-    await firestoreFacade.cart(products);
+
+
+    // await firestoreFacade.cart(products);
   };
 
   return (
@@ -135,7 +136,7 @@ const showPrevious = ({item}) => {
                 </Col>
 
                 <Col sm="6" md="6" className="cart_btn">
-                  <Button onClick={cart}> ADD TO CART</Button>
+                  <Button onClick={ () => {  cart(item)}}> ADD TO CART</Button>
                 </Col>
               </Row>
 
@@ -261,7 +262,7 @@ const showPrevious = ({item}) => {
                     <Card className="product_card">
                       <Card.Img variant="top" src={item?.image?.src} />
                       <Link to={`/home?id=${item.id}`}>
-                        <Button className="add_cart_btn" variant="primary">
+                        <Button   onClick={ () => {  cart(item)}} className="add_cart_btn" variant="primary">
                           Add to Cart
                         </Button>
                       </Link>
