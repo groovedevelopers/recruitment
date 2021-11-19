@@ -16,25 +16,18 @@ const Header = () => {
   // <!-- ////////// PRODUCT OF OBSIDIAN INC., WRITTEN AND DESIGNED BY GROOVE DEVELOPERS INC. YOU ARE PROHIBITED FROM USING OR EDITING
   // THIS APPLICATION WITHOUT INFORMING GROOVE DEVELOPERS INC AND OBSIDIAN INC. ///////////-->
 
-  const [cart, setCart] = useState(null);
+  const [cart, setCart] = useState([]);
 
-  //   const cart$ = userCart$.pipe(
-  //     tap((item) => {
-  //       // console.log(item)
 
-  //       item?.products ? (setCart ( item?.products) ): [];
-  //     }),
-  //   );
+  useEffect(() => {
+    const subscription = userCart$.subscribe((item) => {
+    
+      setCart(item);
+    });
 
-  const effect = useEffect(() => {
-    firstValueFrom(userCart$)
-      .then((item) => {
-        // console.log(item);
-        setCart(item);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
   return (
@@ -50,17 +43,20 @@ const Header = () => {
               <AiOutlineShoppingCart className="icons dropbtn"></AiOutlineShoppingCart>
               {cart?.length}
 
-              <div id="myDropdown" class="dropdown-content">
+              <div id="myDropdown" className="dropdown-content">
                 <Row>
-                  <Col sm="6" md="6">
-                    <div>{cart?.name}</div>
+                  {cart.map((item) => (
+                    <React.Fragment key={item.id}>
+                      <Col sm="6" md="6">
+                        <div>{item?.name}</div>
 
-                    <div>${cart?.price}</div>
-                  </Col>
-
-                  <Col sm="6" md="6">
-                    <img src={cart?.image?.src} />
-                  </Col>
+                        <div>{item?.price}</div>
+                      </Col>
+                      <Col sm="6" md="6">
+                        <img src={item?.cartImage} alt="productImage" />
+                      </Col>
+                    </React.Fragment>
+                  ))}
 
                   <Col sm="12" md="12">
                     <Button> Clear</Button>

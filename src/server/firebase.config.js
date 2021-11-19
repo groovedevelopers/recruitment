@@ -1,6 +1,5 @@
 import firebase from "firebase/app";
 import "firebase/firestore";
-import "firebase/storage";
 import "firebase/auth";
 import "firebase/functions";
 import { authState } from "rxfire/auth";
@@ -33,20 +32,13 @@ if (!firebase.apps.length) {
 
 
 export const db = firebase.firestore();
-export const auth = firebase.auth();
-export const storage = firebase.storage();
 
-export const fireAuthState = authState(auth).pipe(shareReplay(1));
-
-export const singInAnanymousFirebase = () => {
-  return auth.signInAnonymously();
-};
 
 const cartRef = db.collection('cart');
-export const userCart$ = collectionData(cartRef, { idField: 'id' }).pipe(shareReplay(1))
+export const userCart$ = collectionData(cartRef, 'id').pipe(shareReplay(1))
  
 
-export const deleteFromcart = async (id, user) => {
+export const deleteFromcart = async (id) => {
 
   try {
     db.doc(`cart/${id}`).delete();
@@ -72,8 +64,8 @@ export const addToCartFirebase = async (products) => {
   return db.collection('cart').add(products)
 };
 
-export const getProductFromFirebase = () => {
-  const ref = db.collection("products").limit(3);
+export const getProductFromFirebase = (pageNumber = 1) => {
+  const ref = db.collection("products")
   return collectionData(ref, "id");
 };
 export const getOneProduct = (id) => {

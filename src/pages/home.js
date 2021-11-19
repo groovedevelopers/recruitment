@@ -16,36 +16,57 @@ import { RiArrowDropDownLine } from "react-icons/ri";
 import queryString from "query-string";
 import {
   getProductFromFirebase,
-  getOneProduct,
   getCategoriesFromFirebase,
   getFeaturedProductFromFirebase,
+  addToCartFirebase,
 } from "../server/firebase.config";
 import { useLocation } from "react-router-dom";
 import { GiCampfire } from "react-icons/gi";
 import { GrFormPrevious, GrFormNext } from "react-icons/gr";
-import { firstValueFrom } from "rxjs";
+import { BehaviorSubject, combineLatest, firstValueFrom } from "rxjs";
+import { map, take } from "rxjs/operators";
 // import { useAlert } from "react-alert";
 
 const Home = () => {
-  const [products, setProducts] = useState(null);
-  const [category, setCategory] = useState(null);
+  const [products, setProducts] = useState([]);
+  const [category, setCategory] = useState([]);
   const [featured, setFeatured] = useState(null);
   const [page, setPage] = useState(1);
-  const [currentProduct, setCurrentProduct] = useState(null);
-  const idRef = useRef(null);
 
-  let url = window.location.href;
-  let id = queryString.parse(url);
-  const realId = Object.values(id)[0];
+  const checkedCategories = useRef([]);
 
-  const location = useLocation();
+  const selectedCategories$ = useRef(new BehaviorSubject([]));
+  const selectedPrice$ = useRef(new BehaviorSubject({min:0, max:Infinity}));
+  const products$ = useRef(new BehaviorSubject([]));
 
-  const effect = useEffect(() => {
-    const subscription = getProductFromFirebase("products").subscribe(
-      (item) => {
+  useEffect(() => {
+    getProductFromFirebase("products")
+    .pipe(take(1))
+    .subscribe((item) => {
+      products$.current.next(item);
+    });
+    const subscription = combineLatest([
+      selectedCategories$.current,
+      selectedPrice$.current,
+      products$.current,
+    ])
+      .pipe(
+        map(([selectedCategories, selectedPrice, products]) => {
+          return products.filter(item => {
+            const category = item.category[0]
+            return selectedCategories.length  === 0? true :  selectedCategories.includes(category)
+          })
+          .filter(item => {
+
+            return item.price >=  selectedPrice.min &&   item.price <= selectedPrice.max
+          });
+        })
+      )
+      .subscribe((item) => {
         setProducts(item);
-      }
-    );
+      });
+
+   
 
     const featuredSubs = getFeaturedProductFromFirebase("products").subscribe(
       (item) => {
@@ -57,12 +78,6 @@ const Home = () => {
     const catSub = getCategoriesFromFirebase("categories").subscribe((item) => {
       setCategory(item);
     });
-
-    // const query = new URLSearchParams(location.search);
-    // const subs = getOneProduct(realId).subscribe((item) => {
-    //   // console.log(item)
-    //   setCurrentProduct(item);
-    // });
 
     return () => {
       subscription.unsubscribe();
@@ -90,22 +105,21 @@ const Home = () => {
     }
   };
 
-
   //previous button function
-const showPrevious = ({item}) => {
+  const showPrevious = ({ item }) => {
     const fetchPreviousData = async () => {
-        firstValueFrom(getProductFromFirebase())
-          .then((item) => {
-            // console.log(item);
-            setProducts(item);
-            setPage(page - 1);
-          })
-          .catch((error) => {
-            console.log(error);
-          });
-      };
+      firstValueFrom(getProductFromFirebase())
+        .then((item) => {
+          // console.log(item);
+          setProducts(item);
+          setPage(page - 1);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    };
     fetchPreviousData();
-};
+  };
 
   const cart = async (item) => {
     const name = item?.name;
@@ -113,12 +127,29 @@ const showPrevious = ({item}) => {
     const productId = item?.id;
     const cartImage = item?.image?.src;
     const products = { name, price, productId, cartImage };
-    console.log(products)
-
-
-
-    // await firestoreFacade.cart(products);
+    await addToCartFirebase(products);
   };
+
+  const handleCheckBox = (event) => {
+    if (event.target.checked) {
+      checkedCategories.current = [
+        ...checkedCategories.current,
+        event.target.value,
+      ];
+    } else {
+      checkedCategories.current = checkedCategories.current.filter(
+        (item) => item !== event.target.value
+      );
+    }
+
+    selectedCategories$.current.next(checkedCategories.current)
+    console.log(checkedCategories.current);
+  };
+
+  const handleRadioChange =  (event, value) =>{
+
+   selectedPrice$.current.next(value)
+  }
 
   return (
     <div>
@@ -136,23 +167,34 @@ const showPrevious = ({item}) => {
                 </Col>
 
                 <Col sm="6" md="6" className="cart_btn">
-                  <Button onClick={ () => {  cart(item)}}> ADD TO CART</Button>
+                  <Button
+                    onClick={() => {
+                      cart(item);
+                    }}
+                  >
+                    {" "}
+                    ADD TO CART
+                  </Button>
                 </Col>
               </Row>
 
               <Row>
                 <Col sm="12" md="12" className="hero_img">
                   <img src={item?.image?.src} />
-                  <Button onClick={ () => {  cart(item)}}> ADD TO CART</Button>
+                  <Button
+                    onClick={() => {
+                      cart(item);
+                    }}
+                  >
+                    {" "}
+                    ADD TO CART
+                  </Button>
                 </Col>
-                
               </Row>
-              
 
               <Container fluid>
                 <Row className="row3">
                   <Col sm="6" md="6" className="prod_desc">
-                  
                     <div className="t_text">{item?.name}</div>
 
                     <div className="s_text">{item?.category}</div>
@@ -174,15 +216,10 @@ const showPrevious = ({item}) => {
                         <img src={img_s3} />
                       </div>
                     </div>
-                   
-                  
-
-                    
-                    
                   </Col>
 
-                  <Col  className="prod_desc2">
-                  <div className="right">
+                  <Col className="prod_desc2">
+                    <div className="right">
                       <div className="t_text">Details</div>
                       <div className="d_text">Size: 1020 x 1020 pixel</div>
                       <div className="d_text">Size: 15 mb</div>
@@ -222,41 +259,42 @@ const showPrevious = ({item}) => {
             <div className="cat_head">Category</div>
 
             <div className="cat_body">
-              {category?.length === 0 ? (
-                <></>
-              ) : (
-                category?.map((item) => (
-                  <div className="cat_list">
-                    <input type="checkbox" name="" />
-                    &nbsp;
-                    <span>{item?.name}</span>
-                  </div>
-                ))
-              )}
+              {category?.map((item) => (
+                <div className="cat_list">
+                  <input
+                    type="checkbox"
+                    name=""
+                    value={item.name}
+                    onChange={handleCheckBox}
+                  />
+                  &nbsp;
+                  <span>{item?.name}</span>
+                </div>
+              ))}
             </div>
 
             <div className="cat_head">Category</div>
             <div className="cat_body">
               <div className="cat_list">
-                <input type="checkbox" name="" />
+                <input type="radio" name="pricelist" onChange={(event) => {handleRadioChange(event, {min:0, max:20})}}/>
                 &nbsp;
                 <span>Lower than $20</span>
               </div>
 
               <div className="cat_list">
-                <input type="checkbox" name="" />
+                <input type="radio" name="pricelist" onChange={(event) => {handleRadioChange(event, {min:20, max:100})}}/>
                 &nbsp;
                 <span>$20 - $100</span>
               </div>
 
               <div className="cat_list">
-                <input type="checkbox" name="" />
+                <input type="radio" name="pricelist" onChange={(event) => {handleRadioChange(event, {min:100, max:200})}}/>
                 &nbsp;
                 <span>$100 - $200</span>
               </div>
 
               <div className="cat_list">
-                <input type="checkbox" name="" />
+                <input type="radio" name="pricelist" onChange={(event) => {handleRadioChange(event, {min:200, max:Infinity})}}/>
                 &nbsp;
                 <span>More than $200</span>
               </div>
@@ -265,43 +303,44 @@ const showPrevious = ({item}) => {
 
           <Col sm="12" md="9">
             <Row>
-              {products?.length === 0 ? (
-                <></>
-              ) : (
-                products?.map((item) => (
-                  <Col sm="12" md="4">
-                    <Card className="product_card">
-                      <Card.Img variant="top" src={item?.image?.src} />
-                      <Link to={`/home?id=${item.id}`}>
-                        <Button   onClick={ () => {  cart(item)}} className="add_cart_btn" variant="primary">
-                          Add to Cart
-                        </Button>
-                      </Link>
+              {products.map((item) => (
+                <Col sm="12" md="4">
+                  <Card className="product_card">
+                    <Card.Img variant="top" src={item?.image?.src} />
+                    <Link to={`/home?id=${item.id}`}>
+                      <Button
+                        onClick={() => {
+                          cart(item);
+                        }}
+                        className="add_cart_btn"
+                        variant="primary"
+                      >
+                        Add to Cart
+                      </Button>
+                    </Link>
 
-                      {item?.featured === "true" ? (
-                        <div class="badge-featured">
-                          <GiCampfire></GiCampfire> &nbsp;Featured
-                        </div>
-                      ) : (
-                        <> </>
-                      )}
+                    {item?.featured === "true" ? (
+                      <div class="badge-featured">
+                        <GiCampfire></GiCampfire> &nbsp;Featured
+                      </div>
+                    ) : (
+                      <> </>
+                    )}
 
-                      {item?.bestseller === "true" ? (
-                        <div class="badge-bestseller">Bestseller</div>
-                      ) : (
-                        <> </>
-                      )}
-                      <Card.Body className="card_body">
-                        <Card.Text>{item?.category}</Card.Text>
-                        <Card.Title>{item?.name}</Card.Title>
-                        <Card.Text>${item?.price}</Card.Text>
-                      </Card.Body>
-                    </Card>
-                    <br/>
-                  </Col>
-                  
-                ))
-              )}
+                    {item?.bestseller === "true" ? (
+                      <div class="badge-bestseller">Bestseller</div>
+                    ) : (
+                      <> </>
+                    )}
+                    <Card.Body className="card_body">
+                      <Card.Text>{item?.category}</Card.Text>
+                      <Card.Title>{item?.name}</Card.Title>
+                      <Card.Text>{item?.price}</Card.Text>
+                    </Card.Body>
+                  </Card>
+                  <br />
+                </Col>
+              ))}
             </Row>
 
             <div className="pagination">
@@ -328,22 +367,20 @@ const showPrevious = ({item}) => {
                 {
                   //show next button only when we have items
                   //pass last item to showNext function
-                //   products.length > 5 ? (
+                  //   products.length > 5 ? (
 
-                    <Button
-                      onClick={() => showNext({ item: products[products.length - 1] })}
-                    >
-                      {" "}
-                      <GrFormNext
-                        className="icons"
-                       
-                      ></GrFormNext>{" "}
-                      Next
-                    </Button>
-                    
-                //   ) : (
-                //     <></>
-                //   )
+                  <Button
+                    onClick={() =>
+                      showNext({ item: products[products.length - 1] })
+                    }
+                  >
+                    {" "}
+                    <GrFormNext className="icons"></GrFormNext> Next
+                  </Button>
+
+                  //   ) : (
+                  //     <></>
+                  //   )
                 }
               </span>
             </div>
