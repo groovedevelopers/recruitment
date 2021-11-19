@@ -65,7 +65,7 @@ export const addToCartFirebase = async (products) => {
 };
 
 export const getProductFromFirebase = (pageNumber = 1) => {
-  const ref = db.collection("products")
+  const ref = db.collection("products").where('page', '==', pageNumber )
   return collectionData(ref, "id");
 };
 export const getOneProduct = (id) => {

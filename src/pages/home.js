@@ -40,7 +40,7 @@ const Home = () => {
   const products$ = useRef(new BehaviorSubject([]));
 
   useEffect(() => {
-    getProductFromFirebase("products")
+    getProductFromFirebase()
     .pipe(take(1))
     .subscribe((item) => {
       products$.current.next(item);
@@ -94,7 +94,8 @@ const Home = () => {
         firstValueFrom(getProductFromFirebase())
           .then((item) => {
             // console.log(item);
-            setProducts(item);
+            products$.current.next(item)
+          
             setPage(page + 1);
           })
           .catch((error) => {
@@ -111,7 +112,7 @@ const Home = () => {
       firstValueFrom(getProductFromFirebase())
         .then((item) => {
           // console.log(item);
-          setProducts(item);
+          products$.current.next(item)
           setPage(page - 1);
         })
         .catch((error) => {
