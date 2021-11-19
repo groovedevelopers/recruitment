@@ -32,6 +32,7 @@ const Home = () => {
   const [category, setCategory] = useState([]);
   const [featured, setFeatured] = useState(null);
   const [page, setPage] = useState(1);
+  const pageRef = useRef(1);
 
   const checkedCategories = useRef([]);
 
@@ -107,9 +108,17 @@ const Home = () => {
   };
 
   //previous button function
-  const showPrevious = ({ item }) => {
+  const showPrevious = () => {
+    if(pageRef.current === 1){
+      return;
+
+    }
+
+    pageRef.current = pageRef.current -1
+    setPage(pageRef.current )
+
     const fetchPreviousData = async () => {
-      firstValueFrom(getProductFromFirebase())
+      firstValueFrom(getProductFromFirebase( pageRef.current ))
         .then((item) => {
           // console.log(item);
           products$.current.next(item)
@@ -353,7 +362,7 @@ const Home = () => {
                   page === 1 ? (
                     ""
                   ) : (
-                    <Button onClick={() => showPrevious({ item: products[0] })}>
+                    <Button onClick={() => showPrevious()}>
                       {" "}
                       <GrFormPrevious className="icons"></GrFormPrevious>{" "}
                       Previous
