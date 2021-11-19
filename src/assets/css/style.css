@@ -1,3 +1,16 @@
+@import url('https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap');
+
+/* @font-face {
+    font-family: "Archivo";
+    src: url("./Archivo_Black/ArchivoBlack-Regular.ttf");
+    /* src: url("./Space_Mono/") format("woff"),
+    url("./Satoshi_Complete/Fonts/WEB/fonts/Satoshi-Black.ttf") format("opentype"), */
+    
+    
+body{
+    font-family: "Archivo" !important;
+}
+
 a{
     text-decoration: none;
 }
@@ -27,16 +40,151 @@ border-bottom: 4px solid #E4E4E4;
     padding: 20px;
 }
 
-.cart_btn button {
-   float: right;
-   background-color: #000000;
-   border: none;
-   color: white;
-   padding: 10px;
+
+@media only screen and (min-width: 601px) {
+
+    .cart_btn button {
+        float: right;
+        background-color: #000000;
+        border: none;
+        color: white;
+        padding: 10px;
+     }
+.hero_img button{
+    
+
+    display: none;
+}
+
+.mini_img{
+    display: flex;
+    float: right !important;
+
+}
+
+.mini_img img{
+    
+    padding: 10px;
+}
+
+.prod_desc .t_text{
+    font-family: 'Archivo';
+    font-style: normal;
+    font-weight: bold;
+    font-size: 22px;
+    line-height: 24px;
+    padding: 10px;
+    
+    color: #000000;
+}
+
+.prod_desc .s_text{
+    font-family: 'Archivo';
+font-style: normal;
+font-weight: bold;
+font-size: 22px;
+line-height: 24px;
+padding: 10px;
+color: #656565;
+}
+
+.prod_desc .d_text{
+    font-family: 'Archivo';
+font-style: normal;
+font-weight: normal;
+font-size: 18px;
+line-height: 150%;
+/* or 27px */
+padding: 10px;
+
+color: #656565;
+}
+
+}
+@media only screen and (max-width: 600px) {
+
+    .header{
+
+        display: flex !important;
+        }
+
+        .h_logo{
+            
+        }
+
+        /* .h_cart .icons{
+            float: right !important;
+            font-size: 60px;
+        } */
+        .h_cart .dropdown{
+            float: right !important;
+        }
+    .cart_btn button{
+        display: none;
+    }
+.hero_img button{
+    background-color: #000000;
+    border: none;
+    color: white;
+    padding: 10px;
+    width: 100%; 
+}
+
+
+.mini_img{
+    display: flex;
+    /* float: right !important; */
+margin-left: -40px;
+}
+
+.mini_img img{
+    
+    padding: 5px;
+    /* margin-left: -30px; */
+}
+
+.prod_desc .t_text{
+    font-family: 'Archivo';
+    font-style: normal;
+    font-weight: bold;
+    font-size: 22px;
+    line-height: 24px;
+    padding: 10px;
+    
+    color: #000000;
+}
+
+.prod_desc .s_text{
+    font-family: 'Archivo';
+font-style: normal;
+font-weight: bold;
+font-size: 22px;
+line-height: 24px;
+padding: 10px;
+color: #656565;
+}
+
+.prod_desc .d_text{
+    font-family: 'Archivo';
+font-style: normal;
+font-weight: normal;
+font-size: 18px;
+line-height: 150%;
+/* or 27px */
+padding: 10px;
+
+color: #656565;
+}
+
+.product_card .add_cart_btn{
+    
+display: block !important;
+}
+
 }
 
 .hero_title{
-    font-family: Archivo;
+    font-family: 'Archivo';
 font-style: normal;
 font-weight: bold;
 font-size: 25px;
@@ -52,54 +200,11 @@ color: #000000;
     width: 100%;
 }
 
-.mini_img{
-    display: flex;
-    float: right !important;
 
-}
-
-.mini_img img{
-    
-    padding: 10px;
-}
-
-.prod_desc .t_text{
-    font-family: Archivo;
-    font-style: normal;
-    font-weight: bold;
-    font-size: 22px;
-    line-height: 24px;
-    padding: 10px;
-    
-    color: #000000;
-}
-
-.prod_desc .s_text{
-    font-family: Archivo;
-font-style: normal;
-font-weight: bold;
-font-size: 22px;
-line-height: 24px;
-padding: 10px;
-color: #656565;
-}
-
-.prod_desc .d_text{
-    font-family: Archivo;
-font-style: normal;
-font-weight: normal;
-font-size: 18px;
-line-height: 150%;
-/* or 27px */
-padding: 10px;
-
-color: #656565;
-}
 
 .prod_desc2 .t_text{
-    font-family: Archivo;
+    font-family: 'Archivo';
 font-style: normal;
-font-weight: bold;
 font-size: 22px;
 line-height: 24px;
 text-align: right;
@@ -108,7 +213,7 @@ color: #000000;
 }
 
 .prod_desc2 .d_text{
-    font-family: Archivo;
+    font-family: 'Archivo';
 font-style: normal;
 font-weight: normal;
 font-size: 16px;
@@ -196,8 +301,13 @@ color: #656565;
   }
 
   .product_card{
-      border-radius: 12px;
+      /* border-radius: 12px; */
+      border: none;
   }
+
+  .product_card .card_body{
+    padding: 0px;
+}
 
   .product_card .add_cart_btn{
       list-style-type: none;
@@ -219,3 +329,35 @@ display: none;
       font-size: 20px;
       font-weight: 500;
   }
+
+
+  .cat_head{
+    font-family: Archivo;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 22px;
+    line-height: 24px;
+    padding: 10px;
+    color: #000000;
+  }
+
+  .cat_body{
+padding: 20px;
+  }
+
+  .cat_list input{
+    border: 2px solid #000000;
+    box-sizing: border-box;
+  }
+
+  .cat_list span{
+    font-family: 'Archivo';
+    font-style: normal;
+    font-weight: normal;
+    font-size: 22px;
+    line-height: 24px;
+    /* identical to box height */
+    
+    
+    color: #1D1D1D;
+}

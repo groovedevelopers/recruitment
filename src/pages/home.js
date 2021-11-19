@@ -143,12 +143,16 @@ const showPrevious = ({item}) => {
               <Row>
                 <Col sm="12" md="12" className="hero_img">
                   <img src={item?.image?.src} />
+                  <Button onClick={ () => {  cart(item)}}> ADD TO CART</Button>
                 </Col>
+                
               </Row>
+              
 
               <Container fluid>
                 <Row className="row3">
                   <Col sm="6" md="6" className="prod_desc">
+                  
                     <div className="t_text">{item?.name}</div>
 
                     <div className="s_text">{item?.category}</div>
@@ -170,8 +174,15 @@ const showPrevious = ({item}) => {
                         <img src={img_s3} />
                       </div>
                     </div>
+                   
+                  
 
-                    <div className="right">
+                    
+                    
+                  </Col>
+
+                  <Col  className="prod_desc2">
+                  <div className="right">
                       <div className="t_text">Details</div>
                       <div className="d_text">Size: 1020 x 1020 pixel</div>
                       <div className="d_text">Size: 15 mb</div>
@@ -190,7 +201,7 @@ const showPrevious = ({item}) => {
             </div>
           </Col>
 
-          <Col sm="6" md="6">
+          {/* <Col sm="6" md="6">
             <div className="right">
               <span>
                 {" "}
@@ -203,7 +214,7 @@ const showPrevious = ({item}) => {
                 <RiArrowDropDownLine className="icons"></RiArrowDropDownLine>
               </span>
             </div>
-          </Col>
+          </Col> */}
         </Row>
 
         <Row>
@@ -224,7 +235,7 @@ const showPrevious = ({item}) => {
               )}
             </div>
 
-            <div className="cat_head">Categoty</div>
+            <div className="cat_head">Category</div>
             <div className="cat_body">
               <div className="cat_list">
                 <input type="checkbox" name="" />
@@ -280,13 +291,15 @@ const showPrevious = ({item}) => {
                       ) : (
                         <> </>
                       )}
-                      <Card.Body>
+                      <Card.Body className="card_body">
                         <Card.Text>{item?.category}</Card.Text>
                         <Card.Title>{item?.name}</Card.Title>
                         <Card.Text>${item?.price}</Card.Text>
                       </Card.Body>
                     </Card>
+                    <br/>
                   </Col>
+                  
                 ))
               )}
             </Row>
